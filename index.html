@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoftHub | Community App Store</title>
+    <link rel="icon" href="SoftHub.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b0712;
+            --bg-2: #100a1c;
+            --surface: #16101f;
+            --surface-2: #1c1428;
+            --line: rgba(150, 120, 200, .10);
+            --line-hi: rgba(255, 138, 40, .30);
+            --purple: #8a4ff0;
+            --orange: #ff8a28;
+            --red: #ef5350;
+            --txt: #e9e4f2;
+            --txt-2: #9a90ad;
+            --txt-3: #5b5268;
+            --r-lg: 18px;
+            --r-md: 12px;
+            --r-sm: 8px;
+            --ease: cubic-bezier(.4, 0, .2, 1)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--txt);
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            position: relative
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .018) 0px, rgba(255, 255, 255, .018) 1px, transparent 1px, transparent 3px);
+            mix-blend-mode: overlay;
+            opacity: .7
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .45) 100%)
+        }
+
+        .ring-tex {
+            position: fixed;
+            z-index: 0;
+            pointer-events: none;
+            width: 560px;
+            height: 560px;
+            opacity: .5
+        }
+
+        .ring-tex svg {
+            width: 100%;
+            height: 100%
+        }
+
+        .ring-tex.tr {
+            top: -300px;
+            right: -260px
+        }
+
+        .ring-tex.bl {
+            bottom: -300px;
+            left: -260px
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding: 13px 40px;
+            background: rgba(11, 7, 18, .82);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--line)
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            text-decoration: none;
+            flex-shrink: 0
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--line);
+            box-shadow: 0 0 0 3px rgba(138, 79, 240, .08)
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block
+        }
+
+        .brand-name {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            color: var(--txt)
+        }
+
+        .brand-name b {
+            color: var(--orange);
+            font-weight: 800
+        }
+
+        .search {
+            flex-grow: 1;
+            max-width: 440px;
+            position: relative
+        }
+
+        .search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--txt-3);
+            font-size: .85rem
+        }
+
+        .search input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--txt);
+            padding: 10px 14px 10px 40px;
+            border-radius: 50px;
+            font-size: .88rem;
+            outline: none;
+            transition: .2s var(--ease);
+            font-family: inherit
+        }
+
+        .search input:focus {
+            border-color: var(--purple);
+            background: var(--surface-2);
+            box-shadow: 0 0 0 3px rgba(138, 79, 240, .12)
+        }
+
+        .search input::placeholder {
+            color: var(--txt-3)
+        }
+
+        .btn {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            color: var(--txt);
+            background: var(--surface-2);
+            border: 1px solid var(--line);
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: .88rem;
+            transition: .2s var(--ease);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0
+        }
+
+        .btn:hover {
+            border-color: var(--line-hi);
+            color: #fff;
+            background: #221830
+        }
+
+        .btn:active {
+            transform: translateY(1px)
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed
+        }
+
+        .btn.accent {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #1a0f00
+        }
+
+        .btn.accent:hover {
+            background: #ff9a45;
+            border-color: #ff9a45;
+            color: #1a0f00
+        }
+
+        .btn.sm {
+            padding: 7px 15px;
+            font-size: .78rem
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 34px 24px;
+            position: relative;
+            z-index: 1
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 16px
+        }
+
+        .section-title {
+            font-size: .76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: var(--txt-3);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 22px
+        }
+
+        .chip {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--txt-2);
+            padding: 7px 16px;
+            border-radius: 50px;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s var(--ease);
+            font-family: inherit
+        }
+
+        .chip:hover {
+            border-color: var(--line-hi);
+            color: #fff
+        }
+
+        .chip.active {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #1a0f00
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 20px
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            cursor: pointer;
+            transition: .28s var(--ease);
+            position: relative;
+            display: flex;
+            flex-direction: column
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--line-hi);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, .4)
+        }
+
+        .card.malicious-card {
+            border-color: rgba(239, 83, 80, .35)
+        }
+
+        .shots {
+            height: 160px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            background: var(--bg-2);
+            scrollbar-width: none;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .shots::-webkit-scrollbar {
+            display: none
+        }
+
+        .shots img {
+            height: 100%;
+            display: inline-block;
+            object-fit: cover;
+            transition: .25s var(--ease)
+        }
+
+        .card:hover .shots img {
+            filter: brightness(1.1)
+        }
+
+        .shots .none {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--txt-3);
+            font-size: .82rem;
+            gap: 8px
+        }
+
+        .card-body {
+            padding: 16px 18px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            flex-grow: 1
+        }
+
+        .card-top {
+            display: flex;
+            gap: 13px;
+            align-items: center
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--r-md);
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            background: var(--surface-2)
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block
+        }
+
+        .logo.ph {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--orange);
+            background: var(--surface-2)
+        }
+
+        .meta {
+            min-width: 0;
+            flex-grow: 1
+        }
+
+        .title {
+            font-size: 1.02rem;
+            font-weight: 700;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .sub {
+            font-size: .72rem;
+            color: var(--txt-3);
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .desc {
+            font-size: .82rem;
+            color: var(--txt-2);
+            line-height: 1.55;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex-grow: 1
+        }
+
+        .card-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            margin-top: auto;
+            border-top: 1px solid var(--line);
+            flex-wrap: wrap;
+            gap: 6px
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .68rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid transparent
+        }
+
+        .badge.clean {
+            background: rgba(40, 200, 120, .10);
+            color: #3ddc84;
+            border-color: rgba(40, 200, 120, .22)
+        }
+
+        .badge.pending {
+            background: rgba(255, 138, 40, .10);
+            color: var(--orange);
+            border-color: rgba(255, 138, 40, .25)
+        }
+
+        .badge.unverified {
+            background: rgba(150, 150, 150, .08);
+            color: #9a9a9a;
+            border-color: rgba(150, 150, 150, .18)
+        }
+
+        .badge.malicious {
+            background: rgba(239, 83, 80, .12);
+            color: var(--red);
+            border-color: rgba(239, 83, 80, .4)
+        }
+
+        .cat-tag {
+            font-size: .66rem;
+            color: var(--txt-3);
+            border: 1px solid var(--line);
+            padding: 2px 8px;
+            border-radius: 20px
+        }
+
+        .stars-mini {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: .76rem;
+            color: var(--orange);
+            font-weight: 600
+        }
+
+        .empty {
+            text-align: center;
+            padding: 90px 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px
+        }
+
+        .empty.show {
+            display: flex
+        }
+
+        .empty-orb {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            border: 1px dashed var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.9rem;
+            color: var(--purple);
+            margin-bottom: 6px;
+            background: var(--surface)
+        }
+
+        .empty h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--txt-2)
+        }
+
+        .empty p {
+            font-size: .85rem;
+            color: var(--txt-3);
+            max-width: 380px;
+            line-height: 1.55
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 70px 20px;
+            color: var(--txt-3);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px
+        }
+
+        .no-results.show {
+            display: flex
+        }
+
+        .no-results i {
+            font-size: 1.8rem;
+            color: var(--txt-3)
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(6, 4, 10, .86);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: .3s var(--ease);
+            padding: 20px
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible
+        }
+
+        .modal {
+            background: var(--bg-2);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 28px 30px;
+            position: relative;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, .6);
+            transform: translateY(16px) scale(.98);
+            transition: .3s var(--ease)
+        }
+
+        .overlay.active .modal {
+            transform: translateY(0) scale(1)
+        }
+
+        .modal.wide {
+            max-width: 720px
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--txt);
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .modal-title i {
+            color: var(--orange)
+        }
+
+        .x {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--txt-2);
+            font-size: .95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: .2s var(--ease)
+        }
+
+        .x:hover {
+            background: var(--surface-2);
+            color: #fff;
+            border-color: var(--line-hi)
+        }
+
+        .fg {
+            margin-bottom: 17px
+        }
+
+        .fl {
+            display: block;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .09em;
+            color: var(--txt-3);
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .fi,
+        .ft,
+        select.fi {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--txt);
+            padding: 11px 14px;
+            border-radius: var(--r-md);
+            font-size: .9rem;
+            outline: none;
+            transition: .2s var(--ease);
+            font-family: inherit
+        }
+
+        .fi:focus,
+        .ft:focus,
+        select.fi:focus {
+            border-color: var(--purple);
+            background: var(--surface-2);
+            box-shadow: 0 0 0 3px rgba(138, 79, 240, .12)
+        }
+
+        .fi::placeholder,
+        .ft::placeholder {
+            color: var(--txt-3)
+        }
+
+        .ft {
+            resize: vertical;
+            min-height: 86px;
+            line-height: 1.5
+        }
+
+        .file-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none
+        }
+
+        .file-pick {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            padding: 6px 6px 6px 14px;
+            cursor: pointer;
+            transition: .2s var(--ease)
+        }
+
+        .file-pick:hover {
+            border-color: var(--purple);
+            background: var(--surface-2)
+        }
+
+        .fp-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--surface-2);
+            border: 1px solid var(--line);
+            color: var(--txt);
+            padding: 8px 14px;
+            border-radius: var(--r-sm);
+            font-size: .82rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            transition: .2s var(--ease)
+        }
+
+        .file-pick:hover .fp-btn {
+            border-color: var(--line-hi);
+            color: #fff;
+            background: #221830
+        }
+
+        .fp-name {
+            font-size: .82rem;
+            color: var(--txt-3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .fp-name.has {
+            color: var(--orange)
+        }
+
+        .drop {
+            border: 2px dashed var(--line);
+            border-radius: var(--r-md);
+            padding: 24px 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: .2s var(--ease);
+            color: var(--txt-3);
+            font-size: .85rem;
+            background: var(--surface)
+        }
+
+        .drop:hover,
+        .drop.over {
+            border-color: var(--orange);
+            color: var(--orange);
+            background: rgba(255, 138, 40, .05)
+        }
+
+        .drop i {
+            font-size: 1.6rem;
+            display: block;
+            margin-bottom: 8px
+        }
+
+        .fname {
+            font-size: .78rem;
+            color: var(--orange);
+            margin-top: 8px;
+            word-break: break-all;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 15px;
+            background: rgba(239, 83, 80, .06);
+            border: 1px solid rgba(239, 83, 80, .25);
+            border-radius: var(--r-md);
+            margin-bottom: 8px
+        }
+
+        .toggle-row input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--red);
+            flex-shrink: 0
+        }
+
+        .toggle-row .tl {
+            font-size: .82rem;
+            color: var(--txt-2);
+            line-height: 1.45
+        }
+
+        .toggle-row .tl b {
+            color: var(--red)
+        }
+
+        .warn-box {
+            background: rgba(239, 83, 80, .08);
+            border: 1px solid rgba(239, 83, 80, .4);
+            border-radius: var(--r-md);
+            padding: 14px 16px;
+            margin: 12px 0;
+            font-size: .85rem;
+            line-height: 1.55;
+            color: #ffb4b4
+        }
+
+        .warn-box .wt {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 700;
+            color: var(--red);
+            margin-bottom: 7px;
+            font-size: .9rem
+        }
+
+        .detail-hero {
+            display: flex;
+            gap: 17px;
+            align-items: center;
+            margin-bottom: 16px
+        }
+
+        .detail-logo {
+            width: 72px;
+            height: 72px;
+            border-radius: var(--r-md);
+            overflow: hidden;
+            border: 1px solid var(--line);
+            flex-shrink: 0;
+            background: var(--surface-2)
+        }
+
+        .detail-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .detail-logo.ph {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.9rem;
+            color: var(--orange)
+        }
+
+        .detail-info h2 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            line-height: 1.15
+        }
+
+        .detail-info .sub {
+            font-size: .8rem;
+            color: var(--txt-3);
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0;
+            flex-wrap: wrap
+        }
+
+        .star-btn.on {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: #1a0f00
+        }
+
+        .detail-desc {
+            font-size: .9rem;
+            color: var(--txt-2);
+            line-height: 1.65;
+            margin: 13px 0;
+            padding: 15px;
+            background: var(--surface);
+            border-radius: var(--r-md);
+            border: 1px solid var(--line);
+            white-space: pre-wrap
+        }
+
+        .detail-shots {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 0 12px;
+            scrollbar-width: thin
+        }
+
+        .detail-shots img {
+            height: 148px;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--line);
+            flex-shrink: 0
+        }
+
+        .vt-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 11px 0;
+            align-items: center
+        }
+
+        .vt-row .polling {
+            font-size: .72rem;
+            color: var(--txt-3);
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .sec-h {
+            font-size: .74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--txt-3);
+            margin: 20px 0 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .hash-box {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            padding: 11px 13px;
+            overflow-x: auto
+        }
+
+        .hash-box code {
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: .74rem;
+            color: var(--orange);
+            word-break: break-all;
+            white-space: pre
+        }
+
+        .verify-box {
+            margin-bottom: 6px
+        }
+
+        .verify-drop {
+            border: 2px dashed var(--line);
+            border-radius: var(--r-md);
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            color: var(--txt-3);
+            font-size: .84rem;
+            background: var(--surface);
+            transition: .2s var(--ease);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px
+        }
+
+        .verify-drop:hover,
+        .verify-drop.over {
+            border-color: var(--purple);
+            color: var(--purple);
+            background: rgba(138, 79, 240, .05)
+        }
+
+        .verify-result {
+            margin-top: 10px;
+            font-size: .84rem;
+            line-height: 1.5
+        }
+
+        .v-good {
+            color: #3ddc84;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .v-bad {
+            color: #ef5350;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .v-pending {
+            color: var(--txt-3);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .comment {
+            padding: 11px 13px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
+            margin-bottom: 8px
+        }
+
+        .comment .who {
+            font-size: .72rem;
+            color: var(--orange);
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .comment .txt {
+            font-size: .85rem;
+            color: var(--txt-2);
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 11px
+        }
+
+        .comment-form .ft {
+            min-height: 46px;
+            flex-grow: 1
+        }
+
+        .toasts {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .toast {
+            background: var(--bg-2);
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--orange);
+            padding: 12px 18px;
+            border-radius: var(--r-md);
+            font-size: .85rem;
+            font-weight: 500;
+            box-shadow: 0 10px 36px rgba(0, 0, 0, .5);
+            transform: translateX(120%);
+            transition: .3s var(--ease);
+            max-width: 380px;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .toast.show {
+            transform: translateX(0)
+        }
+
+        .toast.err {
+            border-left-color: #ef5350
+        }
+
+        .toast.ok {
+            border-left-color: #3ddc84
+        }
+
+        .loader {
+            display: inline-block;
+            width: 13px;
+            height: 13px;
+            border: 2px solid rgba(255, 255, 255, .25);
+            border-top-color: var(--orange);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            vertical-align: middle
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .loading-grid {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px;
+            color: var(--txt-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px
+        }
+
+        @media(max-width:768px) {
+            header {
+                padding: 11px 16px;
+                flex-wrap: wrap
+            }
+
+            .search {
+                order: 3;
+                max-width: none;
+                flex-basis: 100%
+            }
+
+            .container {
+                padding: 22px 16px
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 15px
+            }
+
+            .modal {
+                padding: 22px 20px
+            }
+
+            .comment-form {
+                flex-wrap: wrap
+            }
+
+            .ring-tex {
+                width: 360px;
+                height: 360px
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(138, 79, 240, .25);
+            border-radius: 4px
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(138, 79, 240, .45)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ring-tex tr"><svg viewBox="0 0 200 200" fill="none">
+            <circle cx="100" cy="100" r="98" stroke="#8a4ff0" stroke-opacity=".10" stroke-width="1" />
+            <circle cx="100" cy="100" r="80" stroke="#8a4ff0" stroke-opacity=".13" stroke-width="1" />
+            <circle cx="100" cy="100" r="62" stroke="#ff8a28" stroke-opacity=".10" stroke-width="1" />
+            <circle cx="100" cy="100" r="44" stroke="#8a4ff0" stroke-opacity=".16" stroke-width="1" />
+            <circle cx="100" cy="100" r="26" stroke="#ff8a28" stroke-opacity=".12" stroke-width="1" />
+        </svg></div>
+    <div class="ring-tex bl"><svg viewBox="0 0 200 200" fill="none">
+            <circle cx="100" cy="100" r="98" stroke="#8a4ff0" stroke-opacity=".10" stroke-width="1" />
+            <circle cx="100" cy="100" r="80" stroke="#ff8a28" stroke-opacity=".11" stroke-width="1" />
+            <circle cx="100" cy="100" r="62" stroke="#8a4ff0" stroke-opacity=".14" stroke-width="1" />
+            <circle cx="100" cy="100" r="44" stroke="#ff8a28" stroke-opacity=".10" stroke-width="1" />
+            <circle cx="100" cy="100" r="26" stroke="#8a4ff0" stroke-opacity=".16" stroke-width="1" />
+        </svg></div>
+
+    <header>
+        <a class="brand" href="#">
+            <div class="brand-logo"><img src="SoftHub.png" alt="SoftHub"></div><span class="brand-name">Soft<b>Hub</b></span>
+        </a>
+        <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="searchInput" placeholder="Search apps..." autocomplete="off"></div>
+        <button class="btn accent" id="uploadBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Upload</button>
+    </header>
+
+    <div class="container">
+        <div class="section-head">
+            <div class="section-title"><i class="fa-solid fa-grip"></i> Community Apps</div>
+            <div class="section-title" id="count" style="letter-spacing:.04em;text-transform:none"></div>
+        </div>
+        <div class="chips" id="chips"></div>
+        <div class="grid" id="grid"></div>
+        <div class="empty" id="empty">
+            <div class="empty-orb"><i class="fa-solid fa-box-open"></i></div>
+            <h3>No apps yet</h3>
+            <p>Be the first to publish. Zip your app (.exe/.apk go inside the zip), upload it, and it gets scanned by VirusTotal before going live.</p>
+            <button class="btn accent" id="emptyUploadBtn" style="margin-top:10px"><i class="fa-solid fa-plus"></i> Upload First App</button>
+        </div>
+        <div class="no-results" id="noResults"><i class="fa-solid fa-magnifying-glass"></i>
+            <div>No apps match "<span id="nrQuery"></span>"</div>
+        </div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="overlay" id="upOverlay">
+        <div class="modal">
+            <div class="modal-head">
+                <div class="modal-title"><i class="fa-solid fa-upload"></i> Submit Your App</div><button class="x" id="closeUpBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="fg"><label class="fl"><i class="fa-solid fa-tag"></i> App Name *</label><input class="fi" id="uName" placeholder="e.g. Pixel Editor Pro"></div>
+            <div class="fg"><label class="fl"><i class="fa-solid fa-align-left"></i> Description *</label><textarea class="ft" id="uDesc" placeholder="What does it do? Features, version..."></textarea></div>
+            <div class="fg"><label class="fl"><i class="fa-solid fa-layer-group"></i> Category</label>
+                <select class="fi" id="uCat">
+                    <option>Game</option>
+                    <option>Tool</option>
+                    <option>Utility</option>
+                    <option>Mod</option>
+                    <option>App</option>
+                    <option selected>Other</option>
+                </select>
+            </div>
+            <div class="fg">
+                <label class="fl"><i class="fa-solid fa-image"></i> App Icon (PNG/JPG)</label>
+                <label class="file-pick" for="uIcon">
+                    <span class="fp-btn"><i class="fa-solid fa-folder-open"></i> Choose file</span>
+                    <span class="fp-name" id="uIconName">No file chosen</span>
+                </label>
+                <input type="file" id="uIcon" accept="image/*" class="file-hidden">
+            </div>
+            <div class="fg">
+                <label class="fl"><i class="fa-solid fa-images"></i> Screenshots (up to 5)</label>
+                <label class="file-pick" for="uShots">
+                    <span class="fp-btn"><i class="fa-solid fa-folder-open"></i> Choose files</span>
+                    <span class="fp-name" id="uShotsName">No files chosen</span>
+                </label>
+                <input type="file" id="uShots" accept="image/*" multiple class="file-hidden">
+            </div>
+            <div class="fg">
+                <label class="fl"><i class="fa-solid fa-file-zipper"></i> App Zip * (put .exe / .apk inside)</label>
+                <div class="drop" id="drop"><i class="fa-solid fa-file-zipper"></i>Drop your .zip here or click to browse</div>
+                <input type="file" id="uFile" accept=".zip" style="display:none">
+                <div class="fname" id="fname"></div>
+            </div>
+            <div class="fg">
+                <div class="toggle-row">
+                    <input type="checkbox" id="uMalicious">
+                    <label class="tl" for="uMalicious"><b>Malicious sample</b> — for malware research only. Skips VirusTotal, marks the app with a red Malicious badge, and shows a warning before &amp; after download. You take full responsibility.</label>
+                </div>
+            </div>
+            <button class="btn accent" id="uBtn" style="width:100%;padding:13px;margin-top:4px;justify-content:center"><i class="fa-solid fa-shield-virus"></i> Scan &amp; Publish</button>
+        </div>
+    </div>
+
+    <!-- DOWNLOAD WARNING (malicious samples) -->
+    <div class="overlay" id="warnOverlay">
+        <div class="modal" style="max-width:480px">
+            <div class="modal-head">
+                <div class="modal-title" style="color:var(--red)"><i class="fa-solid fa-skull-crossbones"></i> Malicious Sample</div><button class="x" id="closeWarnBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="warn-box" style="margin:0">
+                <div class="wt"><i class="fa-solid fa-triangle-exclamation"></i> This file is flagged as malicious</div>
+                It was submitted as a malware research sample and was <b>not</b> cleared by VirusTotal. Do not run it on any machine you care about. Use an isolated sandbox / VM only. By downloading you confirm this is for analysis purposes and you accept full responsibility.
+            </div>
+            <div style="display:flex;gap:10px;margin-top:18px">
+                <button class="btn danger" id="confirmDownloadBtn" style="flex-grow:1;justify-content:center"><i class="fa-solid fa-download"></i> I understand — download anyway</button>
+                <button class="btn sm" id="cancelDownloadBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETAIL -->
+    <div class="overlay" id="detOverlay">
+        <div class="modal wide" id="detModal"></div>
+    </div>
+
+    <div class="toasts" id="toasts"></div>
+
+    <script>
+        const API = 'https://vtshw.umair26dc.workers.dev';
+        const FD_UPLOAD = 'https://new.fileditch.com/upload.php';
+        const CATEGORIES = ['All', 'Game', 'Tool', 'Utility', 'Mod', 'App', 'Other'];
+        const FP_KEY = 'softhub_fp';
+        let FP = localStorage.getItem(FP_KEY);
+        if (!FP) {
+            FP = 'fp_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+            localStorage.setItem(FP_KEY, FP);
+        }
+        let APPS = [],
+            STARS = {},
+            QUERY = '',
+            CAT = 'All';
+        let pendingDownloadUrl = null;
+
+        const $ = function(id) {
+            return document.getElementById(id);
+        };
+        const esc = function(s) {
+            const d = document.createElement('div');
+            d.textContent = s || '';
+            return d.innerHTML;
+        };
+        const escA = function(s) {
+            return (s || '').replace(/"/g, '&quot;');
+        };
+        const fmtBytes = function(b) {
+            if (!b) return '—';
+            const k = 1024,
+                sz = ['B', 'KB', 'MB', 'GB'],
+                i = Math.floor(Math.log(b) / Math.log(k));
+            return (b / Math.pow(k, i)).toFixed(1) + ' ' + sz[i];
+        };
+        const fmtDate = function(iso) {
+            return new Date(iso).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        };
+
+        // FileDitch serves identical files on .me and .st; .st currently refuses connections.
+        function fdUrl(url) {
+            if (!url) return url;
+            try {
+                return url.replace('://fileditchfiles.st/', '://fileditchfiles.me/');
+            } catch (e) {
+                return url;
+            }
+        }
+
+        function toast(msg, type) {
+            type = type || '';
+            const icon = type === 'err' ? 'fa-circle-exclamation' : type === 'ok' ? 'fa-circle-check' : 'fa-circle-info';
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.innerHTML = '<i class="fa-solid ' + icon + '"></i><span>' + esc(msg) + '</span>';
+            $('toasts').appendChild(t);
+            requestAnimationFrame(function() {
+                t.classList.add('show');
+            });
+            setTimeout(function() {
+                t.classList.remove('show');
+                setTimeout(function() {
+                    t.remove();
+                }, 350);
+            }, 3800);
+        }
+
+        function fileToB64(f) {
+            return f ? new Promise(function(res, rej) {
+                const r = new FileReader();
+                r.onload = function() {
+                    res(r.result);
+                };
+                r.onerror = rej;
+                r.readAsDataURL(f);
+            }) : Promise.resolve('');
+        }
+
+        function sha256Hex(file) {
+            return file.arrayBuffer().then(function(buf) {
+                return crypto.subtle.digest('SHA-256', buf).then(function(h) {
+                    return Array.from(new Uint8Array(h)).map(function(b) {
+                        return b.toString(16).padStart(2, '0');
+                    }).join('');
+                });
+            });
+        }
+
+        function uploadToFileDitch(file) {
+            return fetch(FD_UPLOAD + '?filename=' + encodeURIComponent(file.name), {
+                    method: 'PUT',
+                    body: file
+                })
+                .then(function(r) {
+                    return r.json().then(function(j) {
+                        return {
+                            ok: r.ok,
+                            status: r.status,
+                            json: j
+                        };
+                    });
+                });
+        }
+
+        const vtPoll = {
+            timer: null,
+            gist: null,
+            attempts: 0,
+            MAX: 45,
+            INTERVAL: 4000,
+            stop: function() {
+                if (this.timer) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                }
+            },
+            finish: function(app, status, extra) {
+                app.vtStatus = status;
+                if (extra) {
+                    app.vtMalicious = extra.malicious;
+                    app.vtClean = extra.clean;
+                    app.vtTotal = extra.total;
+                }
+                const row = $('detModal').querySelector('.vt-row');
+                if (row) row.innerHTML = vtBadge(app) + (status === 'queued' ? pollingSpinner() : '');
+                render();
+                this.stop();
+            },
+            start: function(app) {
+                this.stop();
+                if (app.malicious || app.vtStatus === 'completed') return;
+                this.gist = app.gistId;
+                this.attempts = 0;
+                const self = this;
+                const tick = async function() {
+                    if (self.gist !== app.gistId || !$('detOverlay').classList.contains('active')) {
+                        self.stop();
+                        return;
+                    }
+                    self.attempts++;
+                    try {
+                        const rc = await fetch(API + '/apps/' + app.gistId + '/recheck', {
+                            method: 'POST'
+                        }).then(function(r) {
+                            return r.json();
+                        });
+                        if (rc.status === 'completed') self.finish(app, 'completed', {
+                            malicious: rc.malicious,
+                            clean: rc.clean,
+                            total: rc.total
+                        });
+                        else if (rc.status === 'unverified' || rc.status === 'malicious') self.finish(app, rc.status === 'malicious' ? 'completed' : 'unverified');
+                        else if (self.attempts >= self.MAX) self.finish(app, 'unverified');
+                    } catch (e) {
+                        if (self.attempts >= self.MAX) self.finish(app, 'unverified');
+                    }
+                };
+                tick();
+                this.timer = setInterval(tick, this.INTERVAL);
+            }
+        };
+
+        function pollingSpinner() {
+            return '<span class="polling"><span class="loader"></span> checking VirusTotal...</span>';
+        }
+
+        // ---- zip drop zone ----
+        const drop = $('drop'),
+            uFile = $('uFile');
+        drop.onclick = function() {
+            uFile.click();
+        };
+        ['dragenter', 'dragover'].forEach(function(e) {
+            drop.addEventListener(e, function(ev) {
+                ev.preventDefault();
+                drop.classList.add('over');
+            });
+        });
+        ['dragleave', 'drop'].forEach(function(e) {
+            drop.addEventListener(e, function(ev) {
+                ev.preventDefault();
+                drop.classList.remove('over');
+            });
+        });
+        drop.addEventListener('drop', function(ev) {
+            if (ev.dataTransfer.files.length) {
+                const f = ev.dataTransfer.files[0];
+                if (!f.name.toLowerCase().endsWith('.zip')) {
+                    toast('Only .zip files are accepted.', 'err');
+                    return;
+                }
+                uFile.files = ev.dataTransfer.files;
+                $('fname').innerHTML = '<i class="fa-solid fa-file-zipper"></i> ' + esc(f.name);
+            }
+        });
+        uFile.onchange = function() {
+            const f = uFile.files[0];
+            if (f && !f.name.toLowerCase().endsWith('.zip')) {
+                toast('Only .zip files are accepted.', 'err');
+                uFile.value = '';
+                $('fname').innerHTML = '';
+                return;
+            }
+            $('fname').innerHTML = f ? '<i class="fa-solid fa-file-zipper"></i> ' + esc(f.name) : '';
+        };
+
+        // ---- styled icon / screenshot inputs ----
+        $('uIcon').onchange = function() {
+            const f = $('uIcon').files[0];
+            const el = $('uIconName');
+            if (f) {
+                el.textContent = f.name;
+                el.classList.add('has');
+            } else {
+                el.textContent = 'No file chosen';
+                el.classList.remove('has');
+            }
+        };
+        $('uShots').onchange = function() {
+            const n = $('uShots').files.length;
+            const el = $('uShotsName');
+            if (n === 0) {
+                el.textContent = 'No files chosen';
+                el.classList.remove('has');
+            } else if (n === 1) {
+                el.textContent = $('uShots').files[0].name;
+                el.classList.add('has');
+            } else {
+                el.textContent = n + ' files chosen';
+                el.classList.add('has');
+            }
+        };
+
+        function openUpload() {
+            $('upOverlay').classList.add('active');
+        }
+
+        function closeUp() {
+            $('upOverlay').classList.remove('active');
+        }
+
+        function closeDet() {
+            vtPoll.stop();
+            $('detOverlay').classList.remove('active');
+        }
+
+        function renderChips() {
+            const wrap = $('chips');
+            wrap.innerHTML = '';
+            CATEGORIES.forEach(function(c) {
+                const b = document.createElement('button');
+                b.className = 'chip' + (CAT === c ? ' active' : '');
+                b.textContent = c;
+                b.onclick = function() {
+                    CAT = c;
+                    renderChips();
+                    render();
+                };
+                wrap.appendChild(b);
+            });
+        }
+
+        async function loadAll() {
+            $('grid').innerHTML = '<div class="loading-grid"><span class="loader"></span> Loading...</div>';
+            try {
+                const a = await fetch(API + '/apps').then(function(r) {
+                    return r.json();
+                });
+                const s = await fetch(API + '/stars').then(function(r) {
+                    return r.json();
+                }).catch(function() {
+                    return {};
+                });
+                APPS = a.apps || [];
+                STARS = s || {};
+                render();
+            } catch (e) {
+                console.error(e);
+                $('grid').innerHTML = '';
+                $('empty').classList.add('show');
+                toast('Failed to load apps: ' + e.message, 'err');
+            }
+        }
+
+        function vtBadge(app) {
+            if (app.malicious) return '<span class="badge malicious"><i class="fa-solid fa-skull-crossbones"></i> Malicious sample</span>';
+            if (app.vtStatus === 'completed') return '<span class="badge clean"><i class="fa-solid fa-shield-halved"></i> Clean (' + app.vtClean + '/' + app.vtTotal + ')</span>';
+            if (app.vtStatus === 'queued') return '<span class="badge pending"><i class="fa-solid fa-clock"></i> Scanning</span>';
+            return '<span class="badge unverified"><i class="fa-solid fa-triangle-exclamation"></i> Unverified</span>';
+        }
+
+        function filteredApps() {
+            const q = QUERY.trim().toLowerCase();
+            return APPS.filter(function(a) {
+                const catOk = CAT === 'All' || (a.category || 'Other') === CAT;
+                const qOk = !q || a.name.toLowerCase().indexOf(q) !== -1 || (a.description || '').toLowerCase().indexOf(q) !== -1 || (a.fileName || '').toLowerCase().indexOf(q) !== -1;
+                return catOk && qOk;
+            });
+        }
+
+        function render() {
+            const grid = $('grid'),
+                empty = $('empty'),
+                nr = $('noResults');
+            grid.innerHTML = '';
+            $('count').innerHTML = APPS.length ? '<i class="fa-solid fa-cube"></i> ' + APPS.length + ' app' + (APPS.length > 1 ? 's' : '') : '';
+            if (!APPS.length) {
+                empty.classList.add('show');
+                nr.classList.remove('show');
+                return;
+            }
+            empty.classList.remove('show');
+            const list = filteredApps();
+            if (!list.length) {
+                nr.classList.add('show');
+                $('nrQuery').textContent = QUERY;
+                return;
+            }
+            nr.classList.remove('show');
+            list.forEach(function(app) {
+                const starCount = (STARS[app.gistId] || []).length;
+                let shots;
+                if ((app.screenshotCount || 0) > 0) {
+                    shots = '';
+                    for (let i = 0; i < app.screenshotCount; i++) shots += '<img src="' + API + '/apps/' + app.gistId + '/shot_' + i + '" loading="lazy" alt="screenshot">';
+                } else {
+                    shots = '<div class="none"><i class="fa-regular fa-image"></i> No screenshots</div>';
+                }
+                const logo = '<div class="logo"><img src="' + API + '/apps/' + app.gistId + '/icon" alt="" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'ph\');this.parentElement.textContent=\'' + escA(app.name.charAt(0).toUpperCase()) + '\'"></div>';
+                const dead = app.fileditchUrl && app.linkAlive === false;
+                const card = document.createElement('div');
+                card.className = 'card' + (app.malicious ? ' malicious-card' : '');
+                card.dataset.gist = app.gistId;
+                card.innerHTML =
+                    '<div class="shots">' + shots + '</div>' +
+                    '<div class="card-body"><div class="card-top">' + logo +
+                    '<div class="meta"><div class="title" title="' + escA(app.name) + '">' + esc(app.name) + '</div>' +
+                    '<div class="sub"><i class="fa-solid fa-weight-hanging"></i> ' + esc(fmtBytes(app.hostedSize || app.fileSize)) + ' · ' + esc(app.zipName || app.fileName || '') + '</div></div></div>' +
+                    '<div class="desc">' + esc(app.description) + '</div>' +
+                    '<div class="card-foot"><div style="display:flex;gap:6px;flex-wrap:wrap">' + vtBadge(app) + '<span class="cat-tag">' + esc(app.category || 'Other') + '</span>' + (dead ? '<span class="badge unverified"><i class="fa-solid fa-link-slash"></i> Link down</span>' : '') + '</div>' +
+                    '<span class="stars-mini"><i class="fa-solid fa-star"></i> ' + starCount + '</span></div></div>';
+                grid.appendChild(card);
+            });
+        }
+
+        async function doUpload() {
+            const name = $('uName').value.trim(),
+                desc = $('uDesc').value.trim(),
+                file = uFile.files[0];
+            const malicious = $('uMalicious').checked;
+            const category = $('uCat').value;
+            if (!name || !desc) {
+                toast('Name and description required.', 'err');
+                return;
+            }
+            if (!file) {
+                toast('Select a .zip file.', 'err');
+                return;
+            }
+            if (!file.name.toLowerCase().endsWith('.zip')) {
+                toast('Only .zip files are accepted.', 'err');
+                return;
+            }
+            const btn = $('uBtn');
+            btn.disabled = true;
+
+            let vt = {
+                status: 'unverified',
+                malicious: -1,
+                harmless: 0,
+                totalEngines: 0,
+                id: null
+            };
+            if (!malicious) {
+                btn.innerHTML = '<span class="loader"></span> Scanning with VirusTotal...';
+                try {
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    const r = await fetch(API + '/scan', {
+                        method: 'POST',
+                        body: fd
+                    }).then(function(x) {
+                        return x.json();
+                    });
+                    if (r.status === 'completed' && r.malicious > 0) {
+                        toast('Blocked: ' + r.malicious + ' engine(s) flagged this zip as malicious. If it is a research sample, check the Malicious toggle.', 'err');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-shield-virus"></i> Scan &amp; Publish';
+                        return;
+                    }
+                    vt = r;
+                } catch (e) {
+                    toast('VT scan unavailable — marking unverified.', 'err');
+                }
+            }
+
+            btn.innerHTML = '<span class="loader"></span> Hashing + uploading to FileDitch...';
+            let fdUrlRes, sha, hostedSize;
+            try {
+                sha = await sha256Hex(file);
+                const up = await uploadToFileDitch(file);
+                if (!up.ok || !up.json.success || !up.json.url) {
+                    const msg = (up.json && up.json.error) ? up.json.error : ('HTTP ' + up.status);
+                    toast('FileDitch upload failed: ' + msg + '. (If blocked, the file type may be rejected.)', 'err');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-shield-virus"></i> Scan &amp; Publish';
+                    return;
+                }
+                fdUrlRes = up.json.url;
+                hostedSize = up.json.size || file.size;
+            } catch (e) {
+                toast('Upload failed: ' + e.message, 'err');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-shield-virus"></i> Scan &amp; Publish';
+                return;
+            }
+
+            btn.innerHTML = '<span class="loader"></span> Saving to SoftHub...';
+            const icon = await fileToB64($('uIcon').files[0]);
+            const shots = await Promise.all(Array.from($('uShots').files).slice(0, 5).map(fileToB64));
+            const meta = {
+                name: name,
+                description: desc,
+                fileName: file.name,
+                fileSize: file.size,
+                vtStatus: malicious ? 'skipped' : (vt.status || 'unverified'),
+                vtMalicious: vt.malicious != null ? vt.malicious : -1,
+                vtClean: vt.harmless != null ? vt.harmless : 0,
+                vtTotal: vt.totalEngines != null ? vt.totalEngines : 0,
+                vtId: vt.id != null ? vt.id : null,
+                uploadedAt: new Date().toISOString(),
+                screenshotCount: shots.filter(Boolean).length
+            };
+            try {
+                const res = await fetch(API + '/apps', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        meta: meta,
+                        icon: icon,
+                        screenshots: shots,
+                        fileditchUrl: fdUrlRes,
+                        sha256: sha,
+                        zipName: file.name,
+                        hostedSize: hostedSize,
+                        category: category,
+                        malicious: malicious
+                    })
+                }).then(function(r) {
+                    return r.json();
+                });
+                if (!res.gistId) throw new Error(res.error || 'no gistId returned');
+                toast('Published to SoftHub.', 'ok');
+                closeUp();
+                resetUp();
+                loadAll();
+            } catch (e) {
+                toast('Save failed: ' + e.message + ' (file is uploaded but not listed — retry)', 'err');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-shield-virus"></i> Scan &amp; Publish';
+            }
+        }
+
+        function resetUp() {
+            ['uName', 'uDesc', 'uIcon', 'uShots', 'uFile'].forEach(function(id) {
+                $(id).value = '';
+            });
+            $('uMalicious').checked = false;
+            $('uCat').value = 'Other';
+            $('fname').innerHTML = '';
+            const ic = $('uIconName');
+            if (ic) {
+                ic.textContent = 'No file chosen';
+                ic.classList.remove('has');
+            }
+            const sh = $('uShotsName');
+            if (sh) {
+                sh.textContent = 'No files chosen';
+                sh.classList.remove('has');
+            }
+        }
+
+        async function openDetail(gistId) {
+            const app = APPS.find(function(a) {
+                return a.gistId === gistId;
+            });
+            if (!app) return;
+            $('detOverlay').classList.add('active');
+            const m = $('detModal');
+            m.innerHTML = '<div style="text-align:center;padding:50px;color:var(--txt-3)"><span class="loader"></span></div>';
+            const detail = await fetch(API + '/apps/' + gistId).then(function(r) {
+                return r.json();
+            }).catch(function() {
+                return {
+                    files: {}
+                };
+            });
+            const comments = await fetch(API + '/apps/' + gistId + '/comments').then(function(r) {
+                return r.json();
+            }).catch(function() {
+                return {
+                    comments: []
+                };
+            });
+            renderDetail(app, detail, comments);
+            vtPoll.start(app);
+        }
+
+        function renderDetail(app, detail, comments) {
+            const m = $('detModal');
+            const hasIcon = !!(detail.files && detail.files['icon.b64']);
+            const starCount = (STARS[app.gistId] || []).length;
+            const starred = (STARS[app.gistId] || []).indexOf(FP) !== -1;
+            let shotsHtml = '';
+            for (let i = 0; i < (app.screenshotCount || 0); i++) {
+                if (detail.files && detail.files['shot_' + i + '.b64']) shotsHtml += '<img src="' + API + '/apps/' + app.gistId + '/shot_' + i + '" alt="screenshot">';
+            }
+            const logo = hasIcon ? '<div class="detail-logo"><img src="' + API + '/apps/' + app.gistId + '/icon" alt=""></div>' : '<div class="detail-logo ph">' + esc(app.name.charAt(0).toUpperCase()) + '</div>';
+            let cmts = '';
+            (comments.comments || []).forEach(function(c) {
+                cmts += '<div class="comment"><div class="who"><i class="fa-solid fa-user"></i> ' + esc(c.user || 'anon') + ' <span style="color:var(--txt-3);font-weight:400"> · ' + fmtDate(c.ts) + '</span></div><div class="txt">' + esc(c.text) + '</div></div>';
+            });
+            if (!cmts) cmts = '<div style="color:var(--txt-3);font-size:.85rem;display:flex;align-items:center;gap:8px"><i class="fa-regular fa-comment"></i> No comments yet. Be the first.</div>';
+            const polling = (!app.malicious && app.vtStatus === 'queued') ? pollingSpinner() : '';
+            const dead = app.fileditchUrl && app.linkAlive === false;
+            const shaRow = app.sha256 ? '<div class="sec-h"><i class="fa-solid fa-fingerprint"></i> Verified SHA-256</div><div class="hash-box"><code>' + esc(app.sha256) + '</code></div>' : '';
+            const malWarn = app.malicious ? '<div class="warn-box"><div class="wt"><i class="fa-solid fa-skull-crossbones"></i> Malicious research sample</div>This app was submitted as a malware sample and was not cleared by VirusTotal. Only download into an isolated sandbox/VM for analysis. You accept full responsibility.</div>' : '';
+
+            m.innerHTML =
+                '<div class="modal-head"><div class="modal-title"><i class="fa-solid fa-cube"></i> App Details</div><button class="x" id="closeDetBtn"><i class="fa-solid fa-xmark"></i></button></div>' +
+                '<div class="detail-hero">' + logo + '<div class="detail-info"><h2>' + esc(app.name) + '</h2>' +
+                '<div class="sub"><i class="fa-solid fa-layer-group"></i> ' + esc(app.category || 'Other') + ' <span style="opacity:.4">·</span> <i class="fa-solid fa-weight-hanging"></i> ' + esc(fmtBytes(app.hostedSize || app.fileSize)) + ' <span style="opacity:.4">·</span> <i class="fa-solid fa-file-zipper"></i> ' + esc(app.zipName || app.fileName || '') + ' <span style="opacity:.4">·</span> <i class="fa-regular fa-calendar"></i> ' + fmtDate(app.uploadedAt) + '</div></div></div>' +
+                malWarn +
+                '<div class="detail-actions">' +
+                '<button class="btn accent sm" id="downloadBtn" data-gist="' + app.gistId + '"' + ((!app.fileditchUrl || dead) ? ' disabled' : '') + '><i class="fa-solid fa-download"></i> ' + (dead ? 'Link down' : 'Download .zip') + '</button>' +
+                '<button class="btn star-btn ' + (starred ? 'on' : '') + '" id="starBtn" data-gist="' + app.gistId + '"><i class="fa-' + (starred ? 'solid' : 'regular') + ' fa-star" id="starIco"></i> <span id="starCnt">' + starCount + '</span> ' + (starred ? 'Starred' : 'Star') + '</button>' +
+                '<button class="btn sm" id="shareBtn" data-gist="' + app.gistId + '"><i class="fa-solid fa-share-nodes"></i> Share</button>' +
+                '</div>' +
+                '<div class="vt-row">' + vtBadge(app) + ' ' + polling + '</div>' +
+                '<div class="detail-desc">' + esc(app.description) + '</div>' + shaRow +
+                '<div class="sec-h"><i class="fa-solid fa-shield-halved"></i> Verify your download</div>' +
+                '<div class="verify-box"><div class="verify-drop" id="verifyDrop"><i class="fa-solid fa-file-circle-check"></i> Drop the downloaded .zip here to confirm it matches the published file</div>' +
+                '<input type="file" id="verifyFile" accept=".zip" style="display:none"><div class="verify-result" id="verifyResult"></div></div>' +
+                (shotsHtml ? '<div class="sec-h"><i class="fa-solid fa-images"></i> Screenshots</div><div class="detail-shots">' + shotsHtml + '</div>' : '') +
+                '<div class="sec-h"><i class="fa-solid fa-comments"></i> Comments (' + (comments.comments || []).length + ')</div><div id="cmtList">' + cmts + '</div>' +
+                '<div class="comment-form"><input class="fi" id="cmtUser" placeholder="Name (optional)" style="max-width:160px;align-self:flex-end">' +
+                '<textarea class="ft" id="cmtInput" placeholder="Leave a comment..."></textarea>' +
+                '<button class="btn accent sm" id="postBtn" data-gist="' + app.gistId + '" style="align-self:flex-end"><i class="fa-solid fa-paper-plane"></i> Post</button></div>';
+
+            const vd = $('verifyDrop'),
+                vf = $('verifyFile');
+            vd.onclick = function() {
+                vf.click();
+            };
+            ['dragenter', 'dragover'].forEach(function(e) {
+                vd.addEventListener(e, function(ev) {
+                    ev.preventDefault();
+                    vd.classList.add('over');
+                });
+            });
+            ['dragleave', 'drop'].forEach(function(e) {
+                vd.addEventListener(e, function(ev) {
+                    ev.preventDefault();
+                    vd.classList.remove('over');
+                });
+            });
+            const runVerify = async function(file) {
+                const res = $('verifyResult');
+                if (!app.sha256) {
+                    res.innerHTML = '<span class="v-bad"><i class="fa-solid fa-triangle-exclamation"></i> No published hash — cannot verify.</span>';
+                    return;
+                }
+                res.innerHTML = '<span class="v-pending"><span class="loader"></span> Hashing file...</span>';
+                try {
+                    const h = await sha256Hex(file);
+                    if (h.toLowerCase() === app.sha256.toLowerCase()) res.innerHTML = '<span class="v-good"><i class="fa-solid fa-circle-check"></i> MATCH — this is the exact file that was published. ' + (app.malicious ? 'Handle only in a sandbox.' : 'Safe to extract.') + '</span>';
+                    else res.innerHTML = '<span class="v-bad"><i class="fa-solid fa-circle-xmark"></i> MISMATCH — not the published file. Do not run it.</span>';
+                } catch (e) {
+                    res.innerHTML = '<span class="v-bad"><i class="fa-solid fa-triangle-exclamation"></i> Could not hash file.</span>';
+                }
+            };
+            vd.addEventListener('drop', function(ev) {
+                if (ev.dataTransfer.files[0]) runVerify(ev.dataTransfer.files[0]);
+            });
+            vf.onchange = function() {
+                if (vf.files[0]) runVerify(vf.files[0]);
+            };
+        }
+
+        function triggerDownload(app) {
+            if (app && app.fileditchUrl) window.open(fdUrl(app.fileditchUrl), '_blank', 'noopener');
+        }
+        async function toggleStar(gistId) {
+            const starred = (STARS[gistId] || []).indexOf(FP) !== -1;
+            const r = await fetch(API + '/stars', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    appId: gistId,
+                    fingerprint: FP,
+                    action: starred ? 'remove' : 'add'
+                })
+            }).then(function(x) {
+                return x.json();
+            });
+            STARS[gistId] = STARS[gistId] || [];
+            if (starred) STARS[gistId] = STARS[gistId].filter(function(f) {
+                return f !== FP;
+            });
+            else STARS[gistId].push(FP);
+            const btn = $('starBtn');
+            if (btn) {
+                btn.classList.toggle('on', !starred);
+                $('starCnt').textContent = r.count;
+                $('starIco').className = 'fa-' + (starred ? 'regular' : 'solid') + ' fa-star';
+                btn.childNodes[btn.childNodes.length - 1].textContent = starred ? ' Star' : ' Starred';
+            }
+            render();
+        }
+        async function postComment(gistId) {
+            const text = $('cmtInput').value.trim();
+            const user = ($('cmtUser').value.trim() || FP.slice(0, 8));
+            if (!text) {
+                toast('Write something first.', 'err');
+                return;
+            }
+            const r = await fetch(API + '/apps/' + gistId + '/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user: user,
+                    text: text
+                })
+            }).then(function(x) {
+                return x.json();
+            }).catch(function(e) {
+                return {
+                    error: e.message
+                };
+            });
+            if (r.error) {
+                toast('Comment failed: ' + r.error, 'err');
+                return;
+            }
+            toast('Comment posted.', 'ok');
+            openDetail(gistId);
+        }
+
+        function shareApp(gistId) {
+            const link = location.origin + location.pathname + '?app=' + encodeURIComponent(gistId);
+            navigator.clipboard.writeText(link).then(function() {
+                toast('Share link copied to clipboard.', 'ok');
+            }).catch(function() {
+                toast('Copy failed.', 'err');
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            const t = e.target.closest('button');
+            if (!t) return;
+            const gid = t.dataset.gist;
+            switch (t.id) {
+                case 'uploadBtn':
+                case 'emptyUploadBtn':
+                    openUpload();
+                    break;
+                case 'closeUpBtn':
+                    closeUp();
+                    break;
+                case 'closeDetBtn':
+                    closeDet();
+                    break;
+                case 'closeWarnBtn':
+                case 'cancelDownloadBtn':
+                    $('warnOverlay').classList.remove('active');
+                    pendingDownloadUrl = null;
+                    break;
+                case 'uBtn':
+                    doUpload();
+                    break;
+                case 'starBtn':
+                    toggleStar(gid);
+                    break;
+                case 'shareBtn':
+                    shareApp(gid);
+                    break;
+                case 'postBtn':
+                    postComment(gid);
+                    break;
+                case 'downloadBtn': {
+                    const app = APPS.find(function(a) {
+                        return a.gistId === gid;
+                    });
+                    if (!app || !app.fileditchUrl) break;
+                    if (app.malicious) {
+                        pendingDownloadUrl = app.fileditchUrl;
+                        $('warnOverlay').classList.add('active');
+                    } else triggerDownload(app);
+                    break;
+                }
+                case 'confirmDownloadBtn': {
+                    if (pendingDownloadUrl) window.open(fdUrl(pendingDownloadUrl), '_blank', 'noopener');
+                    $('warnOverlay').classList.remove('active');
+                    toast('Downloaded a malicious sample — handle only in a sandbox.', 'err');
+                    pendingDownloadUrl = null;
+                    break;
+                }
+            }
+        });
+        document.getElementById('grid').addEventListener('click', function(e) {
+            const c = e.target.closest('.card');
+            if (c && c.dataset.gist) openDetail(c.dataset.gist);
+        });
+        document.querySelectorAll('.overlay').forEach(function(o) {
+            o.addEventListener('click', function(e) {
+                if (e.target === o) {
+                    if (o.id === 'detOverlay') closeDet();
+                    else o.classList.remove('active');
+                }
+            });
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                vtPoll.stop();
+                document.querySelectorAll('.overlay.active').forEach(function(o) {
+                    o.classList.remove('active');
+                });
+            }
+        });
+        $('searchInput').addEventListener('input', function(e) {
+            QUERY = e.target.value;
+            render();
+        });
+
+        window.addEventListener('load', async function() {
+            renderChips();
+            await loadAll();
+            const p = new URLSearchParams(location.search).get('app');
+            if (p && APPS.some(function(a) {
+                    return a.gistId === p;
+                })) openDetail(p);
+        });
+    </script>
+</body>
+
+</html>
