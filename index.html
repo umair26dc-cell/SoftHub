@@ -1332,7 +1332,7 @@
             });
         };
 
-        // FileDitch serves identical files on .me and .st; .st currently refuses connections.
+        // FileDitch serves identical files on .me and .st; .st has refused connections before.
         function fdUrl(url) {
             if (!url) return url;
             try {
@@ -1381,20 +1381,102 @@
             });
         }
 
-        function uploadToFileDitch(file) {
-            return fetch(FD_UPLOAD + '?filename=' + encodeURIComponent(file.name), {
-                    method: 'PUT',
-                    body: file
-                })
-                .then(function(r) {
-                    return r.json().then(function(j) {
-                        return {
-                            ok: r.ok,
-                            status: r.status,
-                            json: j
+        // ---- Host 1: FileDitch (browser-direct PUT, handles huge files) ----
+        function uploadToFileDitch(file, onProgress) {
+            return new Promise(function(resolve) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', FD_UPLOAD + '?filename=' + encodeURIComponent((file.name || 'app.zip').replace(/[^a-zA-Z0-9._-]/g, '_')));
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable && onProgress) onProgress(e.loaded, e.total, 'FileDitch');
+                };
+                xhr.onload = function() {
+                    let j = {};
+                    try {
+                        j = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        j = {
+                            error: 'non-JSON: ' + (xhr.responseText || '').slice(0, 100)
                         };
+                    }
+                    resolve({
+                        ok: xhr.status >= 200 && xhr.status < 300 && j.success && j.url,
+                        url: j.url,
+                        error: j.error || ('HTTP ' + xhr.status)
                     });
-                });
+                };
+                xhr.onerror = function() {
+                    resolve({
+                        ok: false,
+                        error: 'FileDitch network error'
+                    });
+                };
+                xhr.send(file);
+            });
+        }
+
+        // ---- Host 2: 0807.st via worker (PoW solved server-side, no CORS) ----
+        function uploadViaWorker0807(file, onProgress) {
+            return new Promise(function(resolve) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', API + '/upload0807');
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable && onProgress) onProgress(e.loaded, e.total, '0807.st');
+                };
+                xhr.onload = function() {
+                    let j = {};
+                    try {
+                        j = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        j = {
+                            error: 'worker non-JSON'
+                        };
+                    }
+                    resolve(j.ok && j.url ? {
+                        ok: true,
+                        url: j.url
+                    } : {
+                        ok: false,
+                        error: j.error || ('HTTP ' + xhr.status)
+                    });
+                };
+                xhr.onerror = function() {
+                    resolve({
+                        ok: false,
+                        error: 'worker unreachable'
+                    });
+                };
+                const fd = new FormData();
+                fd.append('file', file);
+                xhr.send(fd);
+            });
+        }
+
+        // ---- Host chain: try each in order until one succeeds ----
+        const HOSTS = [{
+                name: 'FileDitch',
+                upload: uploadToFileDitch
+            },
+            {
+                name: '0807.st',
+                upload: uploadViaWorker0807
+            },
+        ];
+        async function uploadToHosts(file, onProgress) {
+            let lastErr = 'no hosts configured';
+            for (let i = 0; i < HOSTS.length; i++) {
+                onProgress && onProgress(0, file.size, 'Trying ' + HOSTS[i].name + '...');
+                const r = await HOSTS[i].upload(file, onProgress);
+                if (r.ok && r.url) return {
+                    ok: true,
+                    url: r.url,
+                    host: HOSTS[i].name
+                };
+                lastErr = r.error || (HOSTS[i].name + ' failed');
+            }
+            return {
+                ok: false,
+                error: lastErr
+            };
         }
 
         const vtPoll = {
@@ -1689,20 +1771,24 @@
                 }
             }
 
-            btn.innerHTML = '<span class="loader"></span> Hashing + uploading to FileDitch...';
-            let fdUrlRes, sha, hostedSize;
+            // Hash, then upload via the host chain (FileDitch -> 0807.st fallback)
+            btn.innerHTML = '<span class="loader"></span> Hashing...';
+            let uploadedUrl, sha, hostedSize, usedHost;
             try {
                 sha = await sha256Hex(file);
-                const up = await uploadToFileDitch(file);
-                if (!up.ok || !up.json.success || !up.json.url) {
-                    const msg = (up.json && up.json.error) ? up.json.error : ('HTTP ' + up.status);
-                    toast('FileDitch upload failed: ' + msg + '. (If blocked, the file type may be rejected.)', 'err');
+                const up = await uploadToHosts(file, function(loaded, total, host) {
+                    const pct = total ? Math.floor((loaded / total) * 100) : 0;
+                    btn.innerHTML = '<span class="loader"></span> Uploading to ' + esc(host) + '... ' + pct + '% (' + fmtBytes(loaded) + ' / ' + fmtBytes(total) + ')';
+                });
+                if (!up.ok || !up.url) {
+                    toast('Upload failed: ' + up.error, 'err');
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fa-solid fa-shield-virus"></i> Scan &amp; Publish';
                     return;
                 }
-                fdUrlRes = up.json.url;
-                hostedSize = up.json.size || file.size;
+                uploadedUrl = up.url;
+                hostedSize = file.size;
+                usedHost = up.host;
             } catch (e) {
                 toast('Upload failed: ' + e.message, 'err');
                 btn.disabled = false;
@@ -1728,32 +1814,40 @@
             };
             try {
                 const res = await fetch(API + '/apps', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        meta: meta,
-                        icon: icon,
-                        screenshots: shots,
-                        fileditchUrl: fdUrlRes,
-                        sha256: sha,
-                        zipName: file.name,
-                        hostedSize: hostedSize,
-                        category: category,
-                        malicious: malicious
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            meta: meta,
+                            icon: icon,
+                            screenshots: shots,
+                            fileditchUrl: uploadedUrl,
+                            sha256: sha,
+                            zipName: file.name,
+                            hostedSize: hostedSize,
+                            category: category,
+                            malicious: malicious,
+                            host: usedHost
+                        })
                     })
-                }).then(function(r) {
-                    return r.json();
-                });
+                    .then(function(r) {
+                        return r.text().then(function(t) {
+                            try {
+                                return JSON.parse(t);
+                            } catch (e) {
+                                throw new Error('worker non-JSON: ' + t.slice(0, 100));
+                            }
+                        });
+                    });
                 if (!res.gistId) throw new Error(res.error || 'no gistId returned');
-                toast('Published to SoftHub.', 'ok');
+                toast('Published to SoftHub via ' + usedHost + '.', 'ok');
                 closeUp();
                 resetUp();
                 loadAll();
             } catch (e) {
-                toast('Save failed: ' + e.message + ' (file is uploaded but not listed — retry)', 'err');
+                toast('Save failed: ' + e.message + ' (file uploaded but not listed — retry)', 'err');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-shield-virus"></i> Scan &amp; Publish';
@@ -2033,6 +2127,12 @@
         $('searchInput').addEventListener('input', function(e) {
             QUERY = e.target.value;
             render();
+        });
+        window.addEventListener('beforeunload', function(e) {
+            if ($('uBtn') && $('uBtn').disabled) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
         });
 
         window.addEventListener('load', async function() {
