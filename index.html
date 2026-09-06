@@ -1332,7 +1332,6 @@
             });
         };
 
-        // FileDitch serves identical files on .me and .st; .st has refused connections before.
         function fdUrl(url) {
             if (!url) return url;
             try {
@@ -1416,7 +1415,8 @@
             });
         }
 
-        // ---- Host 1: FileDitch (browser-direct PUT, handles huge files) ----
+        // ---- Host 1: FileDitch (browser-direct PUT, huge files) — DISABLED while its DNS is dead.
+        //      Uncomment + put FIRST in HOSTS when new.fileditch.com resolves again.
         function uploadToFileDitch(file, onProgress) {
             return new Promise(function(resolve) {
                 const xhr = new XMLHttpRequest();
@@ -1486,15 +1486,12 @@
             });
         }
 
-        // ---- Host chain: try each in order until one succeeds ----
+        // ---- Host chain: onlyfiles primary (FileDitch DNS currently dead — re-enable later) ----
         const HOSTS = [{
-                name: 'FileDitch',
-                upload: uploadToFileDitch
-            },
-            {
                 name: 'onlyfiles.com',
                 upload: uploadViaWorkerOnlyfiles
             },
+            // { name: 'FileDitch', upload: uploadToFileDitch },   // <-- uncomment when fileditch recovers
         ];
         async function uploadToHosts(file, onProgress) {
             let lastErr = 'no hosts configured';
@@ -1576,7 +1573,6 @@
             return '<span class="polling"><span class="loader"></span> checking VirusTotal...</span>';
         }
 
-        // ---- zip drop zone ----
         const drop = $('drop'),
             uFile = $('uFile');
         drop.onclick = function() {
@@ -1616,7 +1612,6 @@
             $('fname').innerHTML = f ? '<i class="fa-solid fa-file-zipper"></i> ' + esc(f.name) : '';
         };
 
-        // ---- styled icon / screenshot inputs ----
         $('uIcon').onchange = function() {
             const f = $('uIcon').files[0];
             const el = $('uIconName');
@@ -1806,7 +1801,6 @@
                 }
             }
 
-            // Hash, compress images, then upload via the host chain (FileDitch -> onlyfiles.com fallback)
             btn.innerHTML = '<span class="loader"></span> Preparing...';
             let uploadedUrl, sha, hostedSize, usedHost;
             try {
