@@ -1381,6 +1381,41 @@
             });
         }
 
+        function compressImage(file, maxDim, quality) {
+            maxDim = maxDim || 1280;
+            quality = quality || 0.82;
+            return new Promise(function(res) {
+                if (!file || !file.type.startsWith('image/')) {
+                    res(file);
+                    return;
+                }
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = function() {
+                    let w = img.width,
+                        h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        const r = Math.min(maxDim / w, maxDim / h);
+                        w = Math.round(w * r);
+                        h = Math.round(h * r);
+                    }
+                    const c = document.createElement('canvas');
+                    c.width = w;
+                    c.height = h;
+                    c.getContext('2d').drawImage(img, 0, 0, w, h);
+                    c.toBlob(function(b) {
+                        URL.revokeObjectURL(url);
+                        res(b || file);
+                    }, 'image/jpeg', quality);
+                };
+                img.onerror = function() {
+                    URL.revokeObjectURL(url);
+                    res(file);
+                };
+                img.src = url;
+            });
+        }
+
         // ---- Host 1: FileDitch (browser-direct PUT, handles huge files) ----
         function uploadToFileDitch(file, onProgress) {
             return new Promise(function(resolve) {
@@ -1414,13 +1449,13 @@
             });
         }
 
-        // ---- Host 2: 0807.st via worker (PoW solved server-side, no CORS) ----
-        function uploadViaWorker0807(file, onProgress) {
+        // ---- Host 2: onlyfiles.com via worker (no PoW, permanent, raw /dl/ link) ----
+        function uploadViaWorkerOnlyfiles(file, onProgress) {
             return new Promise(function(resolve) {
                 const xhr = new XMLHttpRequest();
-                xhr.open('POST', API + '/upload0807');
+                xhr.open('POST', API + '/uploadOnlyfiles');
                 xhr.upload.onprogress = function(e) {
-                    if (e.lengthComputable && onProgress) onProgress(e.loaded, e.total, '0807.st');
+                    if (e.lengthComputable && onProgress) onProgress(e.loaded, e.total, 'onlyfiles.com');
                 };
                 xhr.onload = function() {
                     let j = {};
@@ -1457,8 +1492,8 @@
                 upload: uploadToFileDitch
             },
             {
-                name: '0807.st',
-                upload: uploadViaWorker0807
+                name: 'onlyfiles.com',
+                upload: uploadViaWorkerOnlyfiles
             },
         ];
         async function uploadToHosts(file, onProgress) {
@@ -1771,11 +1806,22 @@
                 }
             }
 
-            // Hash, then upload via the host chain (FileDitch -> 0807.st fallback)
-            btn.innerHTML = '<span class="loader"></span> Hashing...';
+            // Hash, compress images, then upload via the host chain (FileDitch -> onlyfiles.com fallback)
+            btn.innerHTML = '<span class="loader"></span> Preparing...';
             let uploadedUrl, sha, hostedSize, usedHost;
             try {
                 sha = await sha256Hex(file);
+                const iconFile = await compressImage($('uIcon').files[0], 512, 0.85);
+                const shotFiles = await Promise.all(Array.from($('uShots').files).slice(0, 5).map(function(f) {
+                    return compressImage(f, 1280, 0.8);
+                }));
+                const icon = await fileToB64(iconFile);
+                const shots = await Promise.all(shotFiles.map(fileToB64));
+                window.__softhub_media = {
+                    icon: icon,
+                    shots: shots
+                };
+
                 const up = await uploadToHosts(file, function(loaded, total, host) {
                     const pct = total ? Math.floor((loaded / total) * 100) : 0;
                     btn.innerHTML = '<span class="loader"></span> Uploading to ' + esc(host) + '... ' + pct + '% (' + fmtBytes(loaded) + ' / ' + fmtBytes(total) + ')';
@@ -1797,8 +1843,10 @@
             }
 
             btn.innerHTML = '<span class="loader"></span> Saving to SoftHub...';
-            const icon = await fileToB64($('uIcon').files[0]);
-            const shots = await Promise.all(Array.from($('uShots').files).slice(0, 5).map(fileToB64));
+            const media = window.__softhub_media || {
+                icon: '',
+                shots: []
+            };
             const meta = {
                 name: name,
                 description: desc,
@@ -1810,7 +1858,7 @@
                 vtTotal: vt.totalEngines != null ? vt.totalEngines : 0,
                 vtId: vt.id != null ? vt.id : null,
                 uploadedAt: new Date().toISOString(),
-                screenshotCount: shots.filter(Boolean).length
+                screenshotCount: media.shots.filter(Boolean).length
             };
             try {
                 const res = await fetch(API + '/apps', {
@@ -1821,8 +1869,8 @@
                         body: JSON.stringify({
                             name: name,
                             meta: meta,
-                            icon: icon,
-                            screenshots: shots,
+                            icon: media.icon,
+                            screenshots: media.shots,
                             fileditchUrl: uploadedUrl,
                             sha256: sha,
                             zipName: file.name,
@@ -1851,6 +1899,7 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-shield-virus"></i> Scan &amp; Publish';
+                window.__softhub_media = null;
             }
         }
 
