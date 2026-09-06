@@ -1486,11 +1486,11 @@
             });
         }
 
-        // ---- Host chain: onlyfiles primary (FileDitch DNS currently dead — re-enable later) ----
-        const HOSTS = [{
-                name: 'onlyfiles.com',
-                upload: uploadViaWorkerOnlyfiles
-            },
+// ---- Host chain: FileDitch first (huge files), onlyfiles.com fallback ----
+const HOSTS = [
+  { name: 'FileDitch',     upload: uploadToFileDitch },
+  { name: 'onlyfiles.com', upload: uploadViaWorkerOnlyfiles },
+];
             // { name: 'FileDitch', upload: uploadToFileDitch },   // <-- uncomment when fileditch recovers
         ];
         async function uploadToHosts(file, onProgress) {
