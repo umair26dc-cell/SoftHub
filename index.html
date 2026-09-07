@@ -1415,8 +1415,7 @@
             });
         }
 
-        // ---- Host 1: FileDitch (browser-direct PUT, huge files) — DISABLED while its DNS is dead.
-        //      Uncomment + put FIRST in HOSTS when new.fileditch.com resolves again.
+        // ---- Host 1: FileDitch (browser-direct PUT, huge files). Kept primary; falls through to onlyfiles while its DNS is dead. ----
         function uploadToFileDitch(file, onProgress) {
             return new Promise(function(resolve) {
                 const xhr = new XMLHttpRequest();
@@ -1486,12 +1485,15 @@
             });
         }
 
-// ---- Host chain: FileDitch first (huge files), onlyfiles.com fallback ----
-const HOSTS = [
-  { name: 'FileDitch',     upload: uploadToFileDitch },
-  { name: 'onlyfiles.com', upload: uploadViaWorkerOnlyfiles },
-];
-            // { name: 'FileDitch', upload: uploadToFileDitch },   // <-- uncomment when fileditch recovers
+        // ---- Host chain: FileDitch first (huge files), onlyfiles.com fallback ----
+        const HOSTS = [{
+                name: 'FileDitch',
+                upload: uploadToFileDitch
+            },
+            {
+                name: 'onlyfiles.com',
+                upload: uploadViaWorkerOnlyfiles
+            },
         ];
         async function uploadToHosts(file, onProgress) {
             let lastErr = 'no hosts configured';
